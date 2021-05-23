@@ -69,10 +69,10 @@ class Build : NukeBuild
             using (var wc = new WebClient())
             {
                 Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine(">> Downloading native x64 DLL");
-                wc.DownloadFile(url64, dll64);
-                Console.WriteLine(">> Downloading native x86 DLL");
-                wc.DownloadFile(url32, dll32);
+                //Console.WriteLine(">> Downloading native x64 DLL");
+                //wc.DownloadFile(url64, dll64);
+                //Console.WriteLine(">> Downloading native x86 DLL");
+                //wc.DownloadFile(url32, dll32);
                 Console.ResetColor();
             }
 
