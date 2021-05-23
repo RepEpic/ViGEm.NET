@@ -47,6 +47,8 @@ namespace Nefarius.ViGEm.Client.Targets
 
         private ViGEmClient.DS4_REPORT _nativeReport;
 
+        private ViGEmClient.DS4_REPORT_EX _nativeReportEx;
+
         private ViGEmClient.PVIGEM_DS4_NOTIFICATION _notificationCallback;
 
         /// <inheritdoc />
@@ -84,7 +86,7 @@ namespace Nefarius.ViGEm.Client.Targets
             //
             // Callback to event
             // 
-            _notificationCallback = (client, target, motor, smallMotor, color) => FeedbackReceived?.Invoke(this,
+            _notificationCallback = (client, target, motor, smallMotor, color, userData) => FeedbackReceived?.Invoke(this,
                 new DualShock4FeedbackReceivedEventArgs(motor, smallMotor,
                     new LightbarColor(color.Red, color.Green, color.Blue)));
 

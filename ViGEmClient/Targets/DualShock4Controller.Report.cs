@@ -1,4 +1,8 @@
-﻿using Nefarius.ViGEm.Client.Targets.DualShock4;
+﻿using System;
+using System.ComponentModel;
+using System.Runtime.InteropServices;
+using Nefarius.ViGEm.Client.Exceptions;
+using Nefarius.ViGEm.Client.Targets.DualShock4;
 
 namespace Nefarius.ViGEm.Client.Targets
 {
@@ -132,6 +136,32 @@ namespace Nefarius.ViGEm.Client.Targets
 
             if (AutoSubmitReport)
                 SubmitNativeReport(_nativeReport);
+        }
+
+        public void SubmitRawReport(byte[] buffer)
+        {
+            if (buffer.Length != Marshal.SizeOf<ViGEmClient.DS4_REPORT_EX>())
+                throw new ArgumentOutOfRangeException(nameof(buffer), "Supplied buffer has invalid size.");
+
+            _nativeReportEx.Report = buffer;
+
+            var error = ViGEmClient.vigem_target_ds4_update_ex(Client.NativeHandle, NativeHandle, _nativeReportEx);
+
+            switch (error)
+            {
+                case ViGEmClient.VIGEM_ERROR.VIGEM_ERROR_NONE:
+                    break;
+                case ViGEmClient.VIGEM_ERROR.VIGEM_ERROR_BUS_INVALID_HANDLE:
+                    throw new VigemBusInvalidHandleException();
+                case ViGEmClient.VIGEM_ERROR.VIGEM_ERROR_INVALID_TARGET:
+                    throw new VigemInvalidTargetException();
+                case ViGEmClient.VIGEM_ERROR.VIGEM_ERROR_BUS_NOT_FOUND:
+                    throw new VigemBusNotFoundException();
+                case ViGEmClient.VIGEM_ERROR.VIGEM_ERROR_NOT_SUPPORTED:
+                    throw new VigemNotSupportedException();
+                default:
+                    throw new Win32Exception(Marshal.GetLastWin32Error());
+            }
         }
     }
 }

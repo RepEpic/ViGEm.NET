@@ -7,6 +7,7 @@ namespace Nefarius.ViGEm.Client
     using PVIGEM_CLIENT = IntPtr;
     using PVIGEM_TARGET = IntPtr;
     using PVIGEM_TARGET_ADD_RESULT = IntPtr;
+    using PVIGEM_USER_DATA = IntPtr;
 
     [SuppressUnmanagedCodeSecurity]
     partial class ViGEmClient
@@ -27,7 +28,9 @@ namespace Nefarius.ViGEm.Client
             VIGEM_ERROR_CALLBACK_NOT_FOUND = 0xE0000011,
             VIGEM_ERROR_BUS_ALREADY_CONNECTED = 0xE0000012,
             VIGEM_ERROR_BUS_INVALID_HANDLE = 0xE0000013,
-            VIGEM_ERROR_XUSB_USERINDEX_OUT_OF_RANGE = 0xE0000014
+            VIGEM_ERROR_XUSB_USERINDEX_OUT_OF_RANGE = 0xE0000014,
+            VIGEM_ERROR_INVALID_PARAMETER = 0xE0000015,
+            VIGEM_ERROR_NOT_SUPPORTED = 0xE0000016
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -80,6 +83,16 @@ namespace Nefarius.ViGEm.Client
             public DS4_TOUCH sPreviousTouch1;
         }
 
+        /// <summary>
+        ///     TODO: populate actual fields
+        /// </summary>
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        internal struct DS4_REPORT_EX
+        {
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 63)]
+            public byte[] Report;
+        }
+
         internal enum VIGEM_TARGET_TYPE : UInt32
         {
             // 
@@ -110,7 +123,8 @@ namespace Nefarius.ViGEm.Client
             PVIGEM_TARGET Target,
             byte LargeMotor,
             byte SmallMotor,
-            byte LedNumber);
+            byte LedNumber,
+            PVIGEM_USER_DATA UserData);
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         internal delegate void PVIGEM_DS4_NOTIFICATION(
@@ -118,7 +132,8 @@ namespace Nefarius.ViGEm.Client
             PVIGEM_TARGET Target,
             byte LargeMotor,
             byte SmallMotor,
-            DS4_LIGHTBAR_COLOR LightbarColor);
+            DS4_LIGHTBAR_COLOR LightbarColor,
+            PVIGEM_USER_DATA UserData);
 
         [DllImport("vigemclient.dll", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
         static extern PVIGEM_CLIENT vigem_alloc();
@@ -210,6 +225,12 @@ namespace Nefarius.ViGEm.Client
             PVIGEM_CLIENT vigem, 
             PVIGEM_TARGET target, 
             DS4_REPORT report);
+
+        [DllImport("vigemclient.dll", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern VIGEM_ERROR vigem_target_ds4_update_ex(
+            PVIGEM_CLIENT vigem, 
+            PVIGEM_TARGET target, 
+            DS4_REPORT_EX report);
 
         [DllImport("vigemclient.dll", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
         static extern uint vigem_target_get_index(
